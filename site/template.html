@@ -399,8 +399,15 @@ footer strong{color:var(--ink)}
     if(p.pts>=10){out.push(`${p.pts} pts`);if(p.tpm>=7)out.push(`${p.tpm} 3P`);}
     SECONDARY.filter(([k,t])=>p[k]>=t).sort((x,y)=>p[y[0]]-p[x[0]])
       .forEach(([k])=>{if(out.length<3)out.push(`${p[k]} ${k}`);});
-    // Shooting fallback when the line would show fewer than two stats.
-    if(out.length<2)out.push(p.tpm>=3?`${p.tpm}-${p.tpa} 3P`:`${p.fgm}-${p.fga} FG`);
+    // Fewer than two highlights: fill with the player's biggest remaining counting stats
+    // (points first), never shooting splits. The splits stay on the line underneath.
+    if(out.length<2){
+      const shown=new Set(out.map(x=>x.split(' ')[1]));
+      [['pts',p.pts],['reb',p.reb],['ast',p.ast],['stl',p.stl],['blk',p.blk]]
+        .filter(([k,v])=>!shown.has(k)&&v>0)
+        .sort((x,y)=>(y[0]==='pts')-(x[0]==='pts')||y[1]-x[1])
+        .forEach(([k,v])=>{if(out.length<2)out.push(`${v} ${k}`);});
+    }
     return out;
   }
 
