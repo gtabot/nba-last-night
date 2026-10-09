@@ -611,6 +611,7 @@ footer strong{color:var(--ink)}
   // ----- footer: NBA sources only -----
   $('#foot').innerHTML=`<h2>About this page</h2>
     <p>Updated ${esc(D.updated)}. Scores, times, box scores and play-by-play come from the NBA's official game books and NBA.com. Videos are the NBA's own, from NBA.com and the NBA's YouTube channel. The night summary, headlines and recaps are AI-generated from that data. This page isn't affiliated with or endorsed by the NBA or its teams.</p>
+    <p>A project by Gregg Tabot · <a href="https://theycallmegtab.dev/projects/nba-last-night">theycallmegtab.dev</a></p>
     ${(D.archive&&D.archive.length)?`<div><strong>Earlier nights</strong><ul>${D.archive.map(a=>`<li><a href="${esc(a.href)}">${esc(a.label)}</a></li>`).join('')}</ul></div>`:''}
     <div><strong>Sources</strong><ul>${games.map(g=>g.sources.map(u=>`<li>${g.away.abbr} @ ${g.home.abbr}: <a href="${esc(u)}" target="_blank" rel="noopener">${esc(u)}</a></li>`).join('')).join('')}</ul></div>`;
 
