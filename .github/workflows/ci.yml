@@ -1,5 +1,7 @@
-name: Test, build and deploy
+name: Check
 
+# Validates data, runs the tests and makes sure the page builds.
+# Publishing to theycallmegtab.dev is done by scripts/publish_site.py (see README).
 on:
   push:
     branches: [main]
@@ -8,15 +10,9 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: pages
-  cancel-in-progress: false
 
 jobs:
-  build:
+  check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -29,19 +25,9 @@ jobs:
         run: python -m unittest discover -s tests -v
       - name: Build site
         run: python scripts/build.py --out dist
-      - name: Upload site
-        if: github.event_name != 'pull_request'
-        uses: actions/upload-pages-artifact@v3
+      - name: Keep the build for inspection
+        uses: actions/upload-artifact@v4
         with:
+          name: site
           path: dist
-
-  deploy:
-    if: github.event_name != 'pull_request'
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - id: deployment
-        uses: actions/deploy-pages@v4
+          retention-days: 7

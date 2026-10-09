@@ -1,8 +1,20 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="A daily recap of last night's NBA games: scores, tip-off board, margin charts, top performers and official highlights.">
 <title>Last Night in the NBA</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
+/* Base reset (the page is standalone; keep these) */
+html{color-scheme:light;-webkit-text-size-adjust:100%}
+@media (prefers-color-scheme: dark){html{color-scheme:dark}}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+img{max-width:100%}
+[hidden]{display:none!important}
 /* Layout: masthead + AI night summary + ordered ticker + tip-off board, then one collapsible section per
    listed tip window: header band → horizontal score-card selectors → selected game's detail. */
 :root{
@@ -263,7 +275,8 @@ footer strong{color:var(--ink)}
   .flow .stepA,.flow .stepH{stroke-dasharray:none!important}
 }
 </style>
-
+</head>
+<body>
 <script type="application/json" id="recap-data">__DATA__</script>
 
 <div class="wrap">
@@ -317,7 +330,7 @@ footer strong{color:var(--ink)}
   const hm = m=>`${Math.floor(m/60)}:${String(m%60).padStart(2,'0')}`;
   const winner = g=>g.away.score>g.home.score?'away':'home';
   const val = v=>v==null?'—':v;
-  const slug = n=>n.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+  const slug = n=>n.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
   const periods = g=>4+(g.ot||0);
   const pLabel = i=>i<4?`Q${i+1}`:(i===4?'OT':`${i-3}OT`);
   const otTag = g=>g.ot?'/'+(g.ot>1?g.ot:'')+'OT':'';
@@ -643,3 +656,5 @@ footer strong{color:var(--ink)}
   if(!io)document.querySelectorAll('.slot').forEach(s=>playBand(s,slots.find(x=>'slot-'+x.k===s.id)));
 })();
 </script>
+</body>
+</html>

@@ -72,7 +72,14 @@ git commit -m "Recap for <Weekday, Month D, YYYY>: <N> games"
 git push origin main
 ```
 
-Pushing to `main` triggers the deploy workflow.
+Then publish to the site (needs the `gtabot/theycallmegtab.dev` repo cloned next to this one, with push access):
+
+```bash
+python scripts/publish_site.py --site ../theycallmegtab.dev --commit --push \
+  --author "gtabot <gregg.tabot@gmail.com>"
+```
+
+That replaces `public/projects/nba-last-night/` in the site repo and pushes to its `main`; Vercel redeploys the site.
 
 ## 6. Report
 

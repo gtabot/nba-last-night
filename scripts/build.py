@@ -4,7 +4,6 @@
 Output (default dist/):
     dist/index.html               the latest night
     dist/YYYY-MM-DD/index.html    every night, including the latest
-    dist/.nojekyll
 
 Every data file is validated first; the build stops if any file fails.
 Usage: python scripts/build.py [--out dist]
@@ -66,7 +65,6 @@ def main() -> int:
     if out.exists():
         shutil.rmtree(out)
     out.mkdir(parents=True)
-    (out / ".nojekyll").write_text("")
 
     def archive_for(current: str, prefix: str) -> list[dict]:
         return [{"href": f"{prefix}{d['night']}/", "label": d["nightLabel"]}

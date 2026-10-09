@@ -1,5 +1,7 @@
 # Last Night in the NBA
 
+Live at **https://theycallmegtab.dev/projects/nba-last-night/**, as part of [theycallmegtab.dev](https://github.com/gtabot/theycallmegtab.dev).
+
 A single scrolling page that recaps the previous night's NBA games: an AI-written summary of the night, a draggable score ticker, a tip-off board, and a collapsible section for each tip-off window. Each game has its line score, a recap, a margin-by-game-clock chart, official NBA videos, and its top performers by game score.
 
 All game data comes from official NBA sources (the NBA's game books, NBA.com and the NBA's YouTube channel). Headlines, recaps and the night summary are AI-generated from that data and labeled as such. Not affiliated with the NBA.
@@ -7,14 +9,14 @@ All game data comes from official NBA sources (the NBA's game books, NBA.com and
 ## How it works
 
 ```
-morning research (Claude, .claude/skills/nightly-recap)
-        │  writes + validates
-        ▼
-data/YYYY-MM-DD.json  ──git push──►  GitHub Actions
-                                       ├─ validate.py   (data rules)
-                                       ├─ unit tests
-                                       ├─ build.py      (template + data → dist/)
-                                       └─ deploy to GitHub Pages
+morning research (Claude scheduled task, .claude/skills/nightly-recap)
+   │ writes + validates
+   ▼
+data/YYYY-MM-DD.json ──commit──► this repo ──► GitHub Actions: validate, test, build (checks only)
+   │
+   │ scripts/publish_site.py
+   ▼
+theycallmegtab.dev repo: public/projects/nba-last-night/ ──commit──► Vercel redeploys the site
 ```
 
 - **`site/template.html`**: the page. Plain HTML/CSS/JS with no dependencies besides Google Fonts. The night's data is embedded where `__DATA__` appears.
@@ -40,8 +42,17 @@ python -m http.server -d dist 8000         # open http://localhost:8000
 
 ## Adding a night
 
-Have Claude run the `nightly-recap` skill (or a scheduled task that does), or write `data/YYYY-MM-DD.json` by hand following the format doc. Commit it and push to `main`; the workflow validates and deploys. If the data fails validation, nothing is published.
+Have Claude run the `nightly-recap` skill (the daily scheduled task does this), or write `data/YYYY-MM-DD.json` by hand following the format doc. Commit it, then publish (below). If the data fails validation, the build stops and nothing is published.
 
-## One-time setup
+## Publishing to theycallmegtab.dev
 
-In the repo's **Settings → Pages**, set **Source** to **GitHub Actions**. The first push to `main` after that publishes the site at `https://gtabot.github.io/nba-last-night/`.
+The site repo serves anything under `public/` as-is, so publishing is a copy plus a commit:
+
+```bash
+# with both repos cloned side by side
+python scripts/publish_site.py --site ../theycallmegtab.dev --commit --push
+```
+
+This builds the page, replaces `public/projects/nba-last-night/` in the site repo, commits (`nba-last-night: <night>`) and pushes to the site's `main`. Vercel deploys the site on that push. Run it after changing the template too, not just after new data.
+
+No GitHub token or secret is involved: the daily scheduled task has access to both repos and runs this step itself.

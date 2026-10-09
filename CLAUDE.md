@@ -1,6 +1,6 @@
 # Last Night in the NBA
 
-A static, single-page recap of the previous night's NBA games. One HTML template plus one JSON data file per night; GitHub Actions validates, builds and deploys to GitHub Pages.
+A static, single-page recap of the previous night's NBA games. One HTML template plus one JSON data file per night. It's published as part of the personal site at https://theycallmegtab.dev/projects/nba-last-night/ (repo `gtabot/theycallmegtab.dev`, hosted on Vercel).
 
 ## Layout
 
@@ -10,7 +10,8 @@ A static, single-page recap of the previous night's NBA games. One HTML template
 - `scripts/build.py` — validates every data file, then writes `dist/index.html` (latest night) and `dist/YYYY-MM-DD/index.html` (each night).
 - `tests/` — `python -m unittest discover -s tests`.
 - `.claude/skills/nightly-recap/` — the daily data-gathering procedure.
-- `.github/workflows/deploy.yml` — test, build and deploy on every push to `main`.
+- `scripts/publish_site.py` — builds and copies the page into the site repo's `public/projects/nba-last-night/`, then commits and pushes there (Vercel deploys).
+- `.github/workflows/ci.yml` — validate, test and build on every push and pull request (no deploy).
 
 ## Rules
 
