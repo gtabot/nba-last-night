@@ -34,7 +34,7 @@ Tools: WebSearch and WebFetch. A cloud session's shell usually can't reach these
    Book times are in the **arena's local time zone** — convert to Eastern. The book's play-by-play prints the **home** score first — convert to away-home. If the book stops before the end of the game, it is partial: use only what it covers.
 3. **Final score of a partial game:** the nba.com recap video title, "Game Recap: <Winner> <pts>, <Loser> <pts>" (WebSearch with `allowed_domains: ["nba.com"]`).
 4. **Player ids**
-   - nba.com: WebSearch `"<name> nba.com player"` and read the number from `https://www.nba.com/player/<id>/<slug>`. Get at least the top 4 per team by game score; null for the rest.
+   - nba.com: WebSearch `"<name> nba.com player"` and read the number from `https://www.nba.com/player/<id>/<slug>`. Get at least the top 5 per team by game score (the page shows 4); null for the rest.
    - Basketball Reference: WebFetch `https://www.basketball-reference.com/teams/<CODE>/<season end year>.html` (codes match nba.com except BKN→BRK, PHX→PHO, CHA→CHO; 2026-27 → 2027) and ask for every roster player as `Full Name | id` from the `/players/x/<id>.html` links. Match names ignoring accents, punctuation and Jr./III. For anyone missing, WebSearch `"<name> basketball-reference"` with `allowed_domains: ["basketball-reference.com"]`. Null if not found.
 5. **Videos** (at most 5 per game)
    - The nba.com game recap video URL (`src: "nba"`, `kind: "recap"`) — always include when it exists.

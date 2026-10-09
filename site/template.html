@@ -194,8 +194,8 @@ button{font:inherit;color:inherit}
 .row-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:10px}
 .row-head h4{margin:0;font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:500}
 .perf{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.perf-col{display:grid;gap:8px;align-content:start;min-width:0}
-.perf-col h5{margin:0;font-family:var(--display);font-weight:800;font-size:18px;text-transform:uppercase;display:flex;align-items:center;gap:8px}
+.perf-col{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;align-content:start;min-width:0}
+.perf-col h5{grid-column:1/-1;margin:0;font-family:var(--display);font-weight:800;font-size:18px;text-transform:uppercase;display:flex;align-items:center;gap:8px}
 .perf-col h5 i{width:8px;height:16px;border-radius:2px;display:inline-block}
 .pc{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 12px;align-items:center;padding:10px 12px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);text-decoration:none;transition:border-color .2s,transform .2s;transform-origin:50% 100%}
 .pc:hover{border-color:var(--led);transform:translateY(-2px)}
@@ -206,6 +206,7 @@ button{font:inherit;color:inherit}
 .pc .st{font-family:var(--display);font-weight:800;font-size:20px;line-height:1;background:var(--sunk);border-radius:3px;padding:5px 8px;font-variant-numeric:tabular-nums}
 .pc .st small{font-family:var(--mono);font-size:10px;font-weight:500;color:var(--muted);margin-left:3px;letter-spacing:.06em;text-transform:uppercase}
 .pc .shoot{grid-column:1/-1;font-family:var(--mono);font-size:11px;color:var(--muted)}
+.pc .shoot span{white-space:nowrap}
 .box-links{display:flex;gap:18px;flex-wrap:wrap;margin-top:12px;font-family:var(--mono);font-size:13px}
 .box-links a{color:var(--led);text-underline-offset:3px}
 .next{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
@@ -274,6 +275,11 @@ footer strong{color:var(--ink)}
   .big-bot{grid-template-columns:1fr}
   .facts dd{text-align:left}
   .sh-meta .lbl{display:none}
+  .pc{grid-template-columns:minmax(0,1fr);gap:5px;padding:9px 10px}
+  .pc .mn{text-align:left;margin-top:-3px}
+  .pc .line{gap:4px}
+  .pc .st{font-size:17px;padding:4px 6px}
+  .pc .st small{font-size:9px}
   .summary p{font-size:16px}
 }
 @media (prefers-reduced-motion: reduce){
@@ -385,7 +391,8 @@ footer strong{color:var(--ink)}
   /* ---- Players: rank by game score, then build each stat line. ---- */
   const players = (g,side)=>{const c=g.box.cols;return g.box[side].map(r=>Object.fromEntries(c.map((k,i)=>[k,r[i]])));};
   const gameScore = p=>p.pts+0.4*p.fgm-0.7*p.fga-0.4*(p.fta-p.ftm)+0.7*p.orb+0.3*p.drb+p.stl+0.7*p.ast+0.7*p.blk-0.4*p.pf-p.tov;
-  const top3 = (g,side)=>players(g,side).sort((x,y)=>gameScore(y)-gameScore(x)).slice(0,3);
+  const TOP_N = 4; // performers shown per team
+  const topPlayers = (g,side)=>players(g,side).sort((x,y)=>gameScore(y)-gameScore(x)).slice(0,TOP_N);
   const SECONDARY=[['reb',5],['ast',5],['stl',2],['blk',2]];
   function statline(p){
     const out=[];
@@ -548,7 +555,7 @@ footer strong{color:var(--ink)}
   function playerCard(p){
     const href=nbaPlayer(p);
     const mn=p.min?parseInt(p.min,10)+' min':'';
-    return `<a class="pc pu" href="${href}" data-href-nba="${esc(href)}" data-href-bbr="${esc(bbrPlayer(p))}" data-name="${esc(p.name)}" target="_blank" rel="noopener" aria-label="${esc(p.name)} on NBA.com"><span class="who">${esc(p.name)}<span>↗</span></span><span class="mn">${mn}</span><span class="line">${statline(p).map(s=>{const i=s.lastIndexOf(' ');return `<span class="st">${s.slice(0,i)}<small>${s.slice(i+1)}</small></span>`;}).join('')}</span><span class="shoot">${p.fgm}-${p.fga} FG · ${p.tpm}-${p.tpa} 3PT · ${p.ftm}-${p.fta} FT</span></a>`;
+    return `<a class="pc pu" href="${href}" data-href-nba="${esc(href)}" data-href-bbr="${esc(bbrPlayer(p))}" data-name="${esc(p.name)}" target="_blank" rel="noopener" aria-label="${esc(p.name)} on NBA.com"><span class="who">${esc(p.name)}<span>↗</span></span><span class="mn">${mn}</span><span class="line">${statline(p).map(s=>{const i=s.lastIndexOf(' ');return `<span class="st">${s.slice(0,i)}<small>${s.slice(i+1)}</small></span>`;}).join('')}</span><span class="shoot"><span>${p.fgm}-${p.fga} FG</span> · <span>${p.tpm}-${p.tpa} 3PT</span> · <span>${p.ftm}-${p.fta} FT</span></span></a>`;
   }
   const KIND={recap:'Game recap',highlights:'Highlights',player:'Player highlights',other:'Video'};
   function orderVideos(vs){
@@ -580,7 +587,7 @@ footer strong{color:var(--ink)}
         <div class="flow pu" style="--ta:${g._c.a};--th:${g._c.h}">${c.head}${c.svg}</div></div>
       ${videoPanel(g)}
       <div><div class="row-head"><h4>Top performers by game score${thruNote} · tap for <span class="perf-hint">NBA.com</span> profile</h4></div>
-        <div class="perf">${[['away',g._c.a],['home',g._c.h]].map(([side,col])=>`<div class="perf-col"><h5><i style="background:${col}"></i>${esc(g[side].nick)}</h5>${top3(g,side).map(playerCard).join('')}</div>`).join('')}</div>
+        <div class="perf">${[['away',g._c.a],['home',g._c.h]].map(([side,col])=>`<div class="perf-col"><h5><i style="background:${col}"></i>${esc(g[side].nick)}</h5>${topPlayers(g,side).map(playerCard).join('')}</div>`).join('')}</div>
         <div class="box-links"><a href="${esc(g.boxUrl)}" data-href-nba="${esc(g.boxUrl)}" data-href-bbr="${esc(bbrBox(g)||'')}" data-name="Full box score" target="_blank" rel="noopener">Full box score on <span data-lbl>NBA.com</span> ↗</a>${bbrBox(g)?'':'<span class="bx-note" hidden>Basketball Reference doesn\'t cover preseason games</span>'}<a href="${esc(g.bookUrl)}" target="_blank" rel="noopener">Official game book (PDF) ↗</a></div></div>
       ${(nextG||prevG)?`<div class="next">${prevG?`<button class="prev" data-go-game="${prevG.id}"><span class="arr">«</span><span><small>Previous game</small>${esc(prevG.away.abbr)} @ ${esc(prevG.home.abbr)}</span></button>`:''}${nextG?`<button class="nx" data-go-game="${nextG.id}"><span><small>Next game</small>${esc(nextG.away.abbr)} @ ${esc(nextG.home.abbr)}</span><span class="arr">»</span></button>`:''}</div>`:''}`;
     wireChart(el.querySelector('.flow'),g,c);

@@ -66,12 +66,12 @@ Every player who played, for both teams, as rows in this exact column order:
 "cols": ["name","pid","bbref","min","fgm","fga","tpm","tpa","ftm","fta","orb","drb","reb","ast","pf","stl","tov","blk","pts"]
 ```
 
-- `pid`: nba.com player id (int) or null. Needed for players who might rank in the top three.
+- `pid`: nba.com player id (int) or null. Needed for players who might rank in the top four (get the top five per team to be safe).
 - `bbref`: Basketball Reference id such as `"garzalu01"`, or null. Used only to build links.
 - `min`: `"MM:SS"`.
 - Each row must satisfy `pts = 2·fgm + tpm + ftm` and `reb = orb + drb`; each team's rows must sum to its score (or its score through `flowThrough`).
 
-The page ranks players by game score — `PTS + 0.4·FGM − 0.7·FGA − 0.4·(FTA − FTM) + 0.7·ORB + 0.3·DRB + STL + 0.7·AST + 0.7·BLK − 0.4·PF − TOV` — and shows the top three per team.
+The page ranks players by game score — `PTS + 0.4·FGM − 0.7·FGA − 0.4·(FTA − FTM) + 0.7·ORB + 0.3·DRB + STL + 0.7·AST + 0.7·BLK − 0.4·PF − TOV` — and shows the top four per team.
 
 ### Play-by-play
 

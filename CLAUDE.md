@@ -24,7 +24,7 @@ A static, single-page recap of the previous night's NBA games. One HTML template
 
 - Time sections by listed tip, grouped into 30-minute windows; all collapsed on load; header band animates once its top passes mid-viewport.
 - Score-card selectors in a horizontal row; selected game below. Order inside a game: score card → recap + margin chart → dark video panel → top performers → box score links → Previous/Next game.
-- Top performers: top 3 per team by game score. Stat line rule (`statline()` in the template): pts if ≥ 10 (+ "N 3P" if ≥ 7 threes); then reb/ast (≥ 5) and stl/blk (≥ 2), highest first, up to 3 stats; if fewer than 2, add the 3P line (≥ 3 made) or the FG line. Shown as chips with shooting splits underneath.
+- Top performers: top 4 per team by game score (`TOP_N` in the template), cards two per row. Stat line rule (`statline()` in the template): pts if ≥ 10 (+ "N 3P" if ≥ 7 threes); then reb/ast (≥ 5) and stl/blk (≥ 2), highest first, up to 3 stats; if fewer than 2, add the 3P line (≥ 3 made) or the FG line. Shown as chips with shooting splits underneath.
 - Margin chart: team colors, ±20 default y-axis, expands to the nearest 5.
 - Tip-off board: listed tip to final buzzer; unpublished lengths drawn as 2:15, same style.
 - Links toggle (NBA.com / Basketball Reference); preseason box scores stay on NBA.com.
