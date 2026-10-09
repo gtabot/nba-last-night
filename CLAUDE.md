@@ -26,11 +26,11 @@ A static, single-page recap of the previous night's NBA games. One HTML template
 - Score-card selectors in a horizontal row; selected game below. Order inside a game: score card → recap + margin chart → dark video panel → top performers → box score links → Previous/Next game.
 - Top performers: top 4 per team by game score (`TOP_N` in the template), cards two per row. Stat line rule (`statline()` in the template): pts if ≥ 10 (+ "N 3P" if ≥ 7 threes); then reb/ast (≥ 5) and stl/blk (≥ 2), highest first, up to 3 stats; if fewer than 2, fill with the biggest remaining counting stats (pts first). Chips only ever show counting stats (pts, reb, ast, stl, blk, 3P made), never shooting splits; the splits sit on the line underneath.
 - Margin chart: team colors, ±20 default y-axis, expands to the nearest 5.
-- Tip-off board: listed tip to final buzzer; unpublished lengths drawn as 2:15, same style.
+- Tip-off board: bars run from listed tip to final buzzer (header just says "Eastern time"); unpublished lengths drawn as 2:15, same style.
 - Links toggle (NBA.com / Basketball Reference); preseason box scores stay on NBA.com.
 - Theme toggle (Light / Dark / Auto). Auto follows the device. An inline script in <head> applies the saved theme before first paint.
 - Both preferences are remembered in first-party cookies (`nbaTheme`, `nbaLinks`) for a year, scoped to the site's folder so every night's page shares them. Choosing the default (Auto / NBA.com) deletes the cookie.
-- Ticker crawls, is draggable both ways with momentum, and resumes on release.
+- Ticker is fixed to the bottom of the viewport (body padding and the back-to-top button follow its measured height, `--tk-h`); it crawls, is draggable both ways with momentum, and resumes on release.
 - No ads (NBA.com terms limit commercial use of their stats).
 
 ## Local preview
