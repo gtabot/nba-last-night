@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="A daily recap of last night's NBA games: scores, tip-off board, margin charts, top performers and official highlights.">
 <title>Last Night in the NBA</title>
+<script>
+  // Apply the viewer's saved theme (cookie) before the page paints, so there's no flash.
+  (function(){try{var m=document.cookie.match(/(?:^|;\s*)nbaTheme=(light|dark)/);if(m)document.documentElement.setAttribute('data-theme',m[1]);}catch(e){}})();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
@@ -15,6 +19,7 @@ html{color-scheme:light;-webkit-text-size-adjust:100%}
 :root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 img{max-width:100%}
 [hidden]{display:none!important}
+:root[data-theme="light"]{color-scheme:light}
 /* Layout: masthead + AI night summary + ordered ticker + tip-off board, then one collapsible section per
    listed tip window: header band → horizontal score-card selectors → selected game's detail. */
 :root{
@@ -54,6 +59,7 @@ button{font:inherit;color:inherit}
 .phase{font-family:var(--mono);font-weight:600;font-size:13px;color:var(--led);border:1px solid var(--led);padding:3px 8px;border-radius:3px;letter-spacing:.1em}
 .summary{display:grid;gap:6px;max-width:68ch}
 .toprow{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.controls{display:flex;gap:10px 18px;flex-wrap:wrap;align-items:center}
 .seg{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 .seg-btns{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:2px;background:var(--surface)}
 .seg-btns button{all:unset;cursor:pointer;padding:5px 12px;border-radius:999px;font-family:var(--mono);font-size:12px;letter-spacing:.02em;text-transform:none;color:var(--muted)}
@@ -282,7 +288,10 @@ footer strong{color:var(--ink)}
 <div class="wrap">
   <header class="hero">
     <div class="toprow"><div class="eyebrow" id="h-date"></div>
-      <div class="seg" role="group" aria-label="Where game and player links go"><span>Links</span><span class="seg-btns"><button type="button" data-src="nba" aria-pressed="true">NBA.com</button><button type="button" data-src="bbr" aria-pressed="false">Basketball Reference</button></span></div></div>
+      <div class="controls">
+        <div class="seg" role="group" aria-label="Where game and player links go"><span>Links</span><span class="seg-btns" id="seg-links"><button type="button" data-src="nba" aria-pressed="true">NBA.com</button><button type="button" data-src="bbr" aria-pressed="false">Basketball Reference</button></span></div>
+        <div class="seg" role="group" aria-label="Color theme"><span>Theme</span><span class="seg-btns" id="seg-theme"><button type="button" data-theme-opt="light" aria-pressed="false">Light</button><button type="button" data-theme-opt="dark" aria-pressed="false">Dark</button><button type="button" data-theme-opt="auto" aria-pressed="true">Auto</button></span></div>
+      </div></div>
     <div class="brand"><h1>Last Night in the NBA</h1><span class="phase" id="h-phase"></span></div>
     <div class="summary"><span class="ai">AI-generated summary</span><p id="h-sum"></p></div>
   </header>
@@ -335,10 +344,27 @@ footer strong{color:var(--ink)}
   const pLabel = i=>i<4?`Q${i+1}`:(i===4?'OT':`${i-3}OT`);
   const otTag = g=>g.ot?'/'+(g.ot>1?g.ot:'')+'OT':'';
 
-  /* ---- Link source: NBA.com or Basketball Reference (remembered per viewer) ---- */
+  /* ---- Viewer preferences, remembered in first-party cookies for a year ---- */
+  // Scoped to this site's folder so every night's page shares them (e.g. /nba-last-night/).
+  const PREF_PATH=location.pathname.replace(/[^/]*$/,'').replace(/\d{4}-\d{2}-\d{2}\/$/,'')||'/';
+  const getPref=k=>{try{const m=document.cookie.match(new RegExp('(?:^|;\\s*)'+k+'=([^;]*)'));return m?decodeURIComponent(m[1]):null;}catch(e){return null;}};
+  const setPref=(k,v)=>{try{document.cookie=v==null
+      ?`${k}=; path=${PREF_PATH}; max-age=0; SameSite=Lax`
+      :`${k}=${encodeURIComponent(v)}; path=${PREF_PATH}; max-age=31536000; SameSite=Lax${location.protocol==='https:'?'; Secure':''}`;}catch(e){}};
+
+  /* ---- Theme: Light, Dark or Auto (follows the device) ---- */
+  function applyTheme(t){
+    if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);
+    else document.documentElement.removeAttribute('data-theme');
+    document.querySelectorAll('#seg-theme button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.themeOpt===(t||'auto')));
+  }
+  applyTheme(getPref('nbaTheme'));
+  $('#seg-theme').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+    const t=b.dataset.themeOpt;setPref('nbaTheme',t==='auto'?null:t);applyTheme(t==='auto'?null:t);});
+
+  /* ---- Link source: NBA.com or Basketball Reference ---- */
   const BBR_TEAM={BKN:'BRK',PHX:'PHO',CHA:'CHO'};
-  let linkSrc='nba';
-  try{const v=localStorage.getItem('linkSrc');if(v==='bbr'||v==='nba')linkSrc=v;}catch(e){}
+  let linkSrc=getPref('nbaLinks')==='bbr'?'bbr':'nba';
   const nbaPlayer=p=>p.pid?`https://www.nba.com/player/${p.pid}/${slug(p.name)}`:`https://www.nba.com/search?filters=players&q=${encodeURIComponent(p.name)}`;
   const bbrPlayer=p=>p.bbref?`https://www.basketball-reference.com/players/${p.bbref[0]}/${p.bbref}.html`:`https://www.basketball-reference.com/search/search.fcgi?search=${encodeURIComponent(p.name)}`;
   // Basketball Reference has no pages for preseason games, so those links stay on NBA.com.
@@ -351,10 +377,10 @@ footer strong{color:var(--ink)}
       a.setAttribute('aria-label',(a.dataset.name||'')+(useB?' on Basketball Reference':' on NBA.com'));
     });
     root.querySelectorAll('.bx-note').forEach(n=>n.hidden=!(linkSrc==='bbr'));
-    document.querySelectorAll('.seg-btns button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.src===linkSrc));
+    document.querySelectorAll('#seg-links button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.src===linkSrc));
     document.querySelectorAll('.perf-hint').forEach(h=>h.textContent=linkSrc==='bbr'?'Basketball Reference':'NBA.com');
   }
-  document.querySelector('.seg-btns').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;linkSrc=b.dataset.src;try{localStorage.setItem('linkSrc',linkSrc);}catch(err){}applyLinks();});
+  $('#seg-links').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;linkSrc=b.dataset.src;setPref('nbaLinks',linkSrc==='nba'?null:linkSrc);applyLinks();});
 
   /* ---- Players: rank by game score, then build each stat line. ---- */
   const players = (g,side)=>{const c=g.box.cols;return g.box[side].map(r=>Object.fromEntries(c.map((k,i)=>[k,r[i]])));};

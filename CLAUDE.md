@@ -27,7 +27,9 @@ A static, single-page recap of the previous night's NBA games. One HTML template
 - Top performers: top 3 per team by game score. Stat line rule (`statline()` in the template): pts if ≥ 10 (+ "N 3P" if ≥ 7 threes); then reb/ast (≥ 5) and stl/blk (≥ 2), highest first, up to 3 stats; if fewer than 2, add the 3P line (≥ 3 made) or the FG line. Shown as chips with shooting splits underneath.
 - Margin chart: team colors, ±20 default y-axis, expands to the nearest 5.
 - Tip-off board: listed tip to final buzzer; unpublished lengths drawn as 2:15, same style.
-- Links toggle (NBA.com / Basketball Reference) remembered per viewer; preseason box scores stay on NBA.com.
+- Links toggle (NBA.com / Basketball Reference); preseason box scores stay on NBA.com.
+- Theme toggle (Light / Dark / Auto). Auto follows the device. An inline script in <head> applies the saved theme before first paint.
+- Both preferences are remembered in first-party cookies (`nbaTheme`, `nbaLinks`) for a year, scoped to the site's folder so every night's page shares them. Choosing the default (Auto / NBA.com) deletes the cookie.
 - Ticker crawls, is draggable both ways with momentum, and resumes on release.
 - No ads (NBA.com terms limit commercial use of their stats).
 
