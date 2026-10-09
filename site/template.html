@@ -599,7 +599,7 @@ footer strong{color:var(--ink)}
     const sec=document.createElement('section');sec.className='slot';sec.dataset.open='false';sec.id='slot-'+slot.k;
     sec.innerHTML=`<button class="slot-head" aria-expanded="false" aria-controls="body-${slot.k}"><canvas aria-hidden="true"></canvas>
         <span class="sh-in"><span class="sh-time">${clock(slot.k,'').replace(/ (AM|PM)$/,'')}<small>${slot.k>=720?'PM':'AM'} ET</small></span>
-        <span class="sh-meta"><span class="lbl">${n} game${n>1?'s':''} · ${clock(slot.k-180,'PT')}</span><span class="chev">${CHEV}</span></span></span></button>
+        <span class="sh-meta"><span class="lbl">${n} game${n>1?'s':''}</span><span class="chev">${CHEV}</span></span></span></button>
       <div class="slot-body" id="body-${slot.k}"><div class="slot-inner"><div class="slot-pad">
         <div class="picks hscroll" role="tablist" aria-label="Games at ${clock(slot.k,'ET')}">${slot.games.map((g,i)=>scoreCard(g,i===0)).join('')}</div>
         <div class="holder"></div></div></div></div>`;
