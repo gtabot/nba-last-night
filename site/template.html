@@ -58,6 +58,8 @@ button{font:inherit;color:inherit}
 .daynav a{color:var(--muted);text-decoration:none}
 .daynav a:hover{color:var(--ink);text-decoration:underline}
 .daynav .next{margin-left:auto;text-align:right}
+#h-date a{color:inherit;text-decoration:none}
+#h-date a:hover{color:var(--ink);text-decoration:underline}
 .brand{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
 .brand h1{font-size:clamp(46px,9.5vw,96px);font-weight:900;text-transform:uppercase}
 .phase{font-family:var(--mono);font-weight:600;font-size:13px;color:var(--led);border:1px solid var(--led);padding:3px 8px;border-radius:3px;letter-spacing:.1em}
@@ -285,6 +287,8 @@ footer strong{color:var(--ink)}
   .pc .st{font-size:17px;padding:4px 6px}
   .pc .st small{font-size:9px}
   .summary p{font-size:16px}
+  .daynav .wd{display:none}
+  .toprow #h-date{order:1;flex-basis:100%}
 }
 @media (prefers-reduced-motion: reduce){
   *,*::before,*::after{animation:none!important;transition:none!important}
@@ -423,13 +427,14 @@ footer strong{color:var(--ink)}
   games.forEach(g=>{const k=Math.floor(g._s/30)*30;let s=slots.find(x=>x.k===k);if(!s){s={k,games:[]};slots.push(s);}s.games.push(g);});
 
   // ----- masthead -----
-  $('#h-date').textContent = D.nightLabel;
+  $('#h-date').innerHTML = D.nightHref?`<a href="${esc(D.nightHref)}">${esc(D.nightLabel)}</a>`:esc(D.nightLabel);
   $('#h-phase').textContent = D.phase.toUpperCase();
   $('#h-sum').textContent = D.summary||'';
   if(D.prevNight||D.nextNight){
     const dn=$('#daynav');dn.hidden=false;
-    dn.innerHTML=(D.prevNight?`<a class="prev" rel="prev" href="${esc(D.prevNight.href)}">&laquo; ${esc(D.prevNight.label)}</a>`:'<span></span>')
-      +(D.nextNight?`<a class="next" rel="next" href="${esc(D.nextNight.href)}">${esc(D.nextNight.label)} &raquo;</a>`:'<span></span>');
+    const lbl=s=>{const i=s.indexOf(', ');return i<0?esc(s):`<span class="wd">${esc(s.slice(0,i+2))}</span>${esc(s.slice(i+2))}`;};
+    dn.innerHTML=(D.prevNight?`<a class="prev" rel="prev" href="${esc(D.prevNight.href)}">&laquo; ${lbl(D.prevNight.label)}</a>`:'<span></span>')
+      +(D.nextNight?`<a class="next" rel="next" href="${esc(D.nextNight.href)}">${lbl(D.nextNight.label)} &raquo;</a>`:'<span></span>');
   }
 
   const tkItem = g=>{const w=winner(g);return `<button class="tk" data-go="${g.id}"><span class="t">${clock(g._s,'')}</span><b class="${w==='away'?'':'l'}">${g.away.abbr} ${g.away.score}</b><b class="${w==='home'?'':'l'}">${g.home.abbr} ${g.home.score}</b><em>FINAL${otTag(g)}</em></button>`;};

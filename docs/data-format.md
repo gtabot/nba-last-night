@@ -15,7 +15,7 @@ One file per night: `data/YYYY-MM-DD.json`, named for the date the games were pl
 | `summary` | string | 2–3 sentence AI-written overview of the night. Every claim must be backed by the games' data. |
 | `games` | array | One object per game, any order (the page orders by `schedET`). |
 
-The build adds `prevNight` and `nextNight` (`{"href", "label"}` or null, the neighboring built nights) itself — don't put them in data files.
+The build adds `nightHref` (this night's own page, linked from the date at the top), `prevNight` and `nextNight` (`{"href", "label"}` or null, the neighboring built nights) itself — don't put them in data files.
 
 ## Game
 
