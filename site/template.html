@@ -54,6 +54,10 @@ button{font:inherit;color:inherit}
 
 /* ---------- masthead ---------- */
 .hero{padding-block:36px 24px;display:grid;gap:14px}
+.daynav{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-family:var(--mono);font-size:13px}
+.daynav a{color:var(--muted);text-decoration:none}
+.daynav a:hover{color:var(--ink);text-decoration:underline}
+.daynav .next{margin-left:auto;text-align:right}
 .brand{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
 .brand h1{font-size:clamp(46px,9.5vw,96px);font-weight:900;text-transform:uppercase}
 .phase{font-family:var(--mono);font-weight:600;font-size:13px;color:var(--led);border:1px solid var(--led);padding:3px 8px;border-radius:3px;letter-spacing:.1em}
@@ -293,6 +297,7 @@ footer strong{color:var(--ink)}
 
 <div class="wrap">
   <header class="hero">
+    <nav class="daynav" id="daynav" aria-label="Other nights" hidden></nav>
     <div class="toprow"><div class="eyebrow" id="h-date"></div>
       <div class="controls">
         <div class="seg" role="group" aria-label="Where game and player links go"><span>Links</span><span class="seg-btns" id="seg-links"><button type="button" data-src="nba" aria-pressed="true">NBA.com</button><button type="button" data-src="bbr" aria-pressed="false">Basketball Reference</button></span></div>
@@ -421,6 +426,11 @@ footer strong{color:var(--ink)}
   $('#h-date').textContent = D.nightLabel;
   $('#h-phase').textContent = D.phase.toUpperCase();
   $('#h-sum').textContent = D.summary||'';
+  if(D.prevNight||D.nextNight){
+    const dn=$('#daynav');dn.hidden=false;
+    dn.innerHTML=(D.prevNight?`<a class="prev" rel="prev" href="${esc(D.prevNight.href)}">&laquo; ${esc(D.prevNight.label)}</a>`:'<span></span>')
+      +(D.nextNight?`<a class="next" rel="next" href="${esc(D.nextNight.href)}">${esc(D.nextNight.label)} &raquo;</a>`:'<span></span>');
+  }
 
   const tkItem = g=>{const w=winner(g);return `<button class="tk" data-go="${g.id}"><span class="t">${clock(g._s,'')}</span><b class="${w==='away'?'':'l'}">${g.away.abbr} ${g.away.score}</b><b class="${w==='home'?'':'l'}">${g.home.abbr} ${g.home.score}</b><em>FINAL${otTag(g)}</em></button>`;};
   const tks = games.map(tkItem).join('');
@@ -567,10 +577,10 @@ footer strong{color:var(--ink)}
     return `<a class="pc pu" href="${href}" data-href-nba="${esc(href)}" data-href-bbr="${esc(bbrPlayer(p))}" data-name="${esc(p.name)}" target="_blank" rel="noopener" aria-label="${esc(p.name)} on NBA.com"><span class="who">${esc(p.name)}<span>↗</span></span><span class="mn">${mn}</span><span class="line">${statline(p).map(s=>{const i=s.lastIndexOf(' ');return `<span class="st">${s.slice(0,i)}<small>${s.slice(i+1)}</small></span>`;}).join('')}</span><span class="shoot"><span>${p.fgm}-${p.fga} FG</span> · <span>${p.tpm}-${p.tpa} 3PT</span> · <span>${p.ftm}-${p.fta} FT</span></span></a>`;
   }
   const KIND={recap:'Game recap',highlights:'Highlights',player:'Player highlights',other:'Video'};
+  // YouTube first (those are the embeddable ones), then NBA.com; in each group the recap leads, then most viewed.
   function orderVideos(vs){
-    const rec=vs.filter(v=>v.kind==='recap'),rest=vs.filter(v=>v.kind!=='recap');
-    rest.sort((a,b)=>(b.views??-1)-(a.views??-1));
-    return rec.concat(rest);
+    const rank=v=>(v.src==='yt'?0:2)+(v.kind==='recap'?0:1);
+    return vs.slice().sort((a,b)=>rank(a)-rank(b)||(b.views??-1)-(a.views??-1));
   }
   function videoPanel(g){
     const vids=orderVideos(g.videos||[]);
@@ -654,7 +664,6 @@ footer strong{color:var(--ink)}
   $('#foot').innerHTML=`<h2>About this page</h2>
     <p>A Project by <a href="https://theycallmegtab.dev">TheyCallMeGTab</a></p>
     <p>Updated ${esc(D.updated)}. Scores, times, box scores and play-by-play come from the NBA's official game books and NBA.com. Videos are the NBA's own, from NBA.com and the NBA's YouTube channel. The night summary, headlines and recaps are AI-generated from that data. This page isn't affiliated with or endorsed by the NBA or its teams.</p>
-    ${(D.archive&&D.archive.length)?`<div><strong>Earlier nights</strong><ul>${D.archive.map(a=>`<li><a href="${esc(a.href)}">${esc(a.label)}</a></li>`).join('')}</ul></div>`:''}
     <div><strong>Sources</strong><ul>${games.map(g=>g.sources.map(u=>`<li>${g.away.abbr} @ ${g.home.abbr}: <a href="${esc(u)}" target="_blank" rel="noopener">${esc(u)}</a></li>`).join('')).join('')}</ul></div>`;
 
   // ----- header band animation (original graphic; plays once when scrolled to) -----

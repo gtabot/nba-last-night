@@ -29,16 +29,14 @@ def embed(data: dict) -> str:
     return json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
 
 
-def page(template: str, data: dict, archive: list[dict]) -> str:
-    return template.replace(PLACEHOLDER, embed({**data, "archive": archive}), 1)
+def page(template: str, data: dict, nav: dict) -> str:
+    return template.replace(PLACEHOLDER, embed({**data, **nav}), 1)
 
 
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default=str(ROOT / "dist"))
-    ap.add_argument("--keep", type=int, default=30, help="earlier nights to list in the footer")
     out = Path(ap.parse_args().out)
-    keep = ap.parse_args().keep
 
     template = TEMPLATE.read_text(encoding="utf-8")
     if template.count(PLACEHOLDER) != 1:
@@ -66,16 +64,18 @@ def main() -> int:
         shutil.rmtree(out)
     out.mkdir(parents=True)
 
-    def archive_for(current: str, prefix: str) -> list[dict]:
-        return [{"href": f"{prefix}{d['night']}/", "label": d["nightLabel"]}
-                for d in nights if d["night"] != current][:keep]
+    def nav_for(i: int, prefix: str) -> dict:
+        """Links to the night before (older) and the night after (newer), if built."""
+        link = lambda d: {"href": f"{prefix}{d['night']}/", "label": d["nightLabel"]}
+        return {"prevNight": link(nights[i + 1]) if i + 1 < len(nights) else None,
+                "nextNight": link(nights[i - 1]) if i > 0 else None}
 
     latest = nights[0]
-    (out / "index.html").write_text(page(template, latest, archive_for(latest["night"], "")), encoding="utf-8")
-    for d in nights:
+    (out / "index.html").write_text(page(template, latest, nav_for(0, "")), encoding="utf-8")
+    for i, d in enumerate(nights):
         folder = out / d["night"]
         folder.mkdir()
-        (folder / "index.html").write_text(page(template, d, archive_for(d["night"], "../")), encoding="utf-8")
+        (folder / "index.html").write_text(page(template, d, nav_for(i, "../")), encoding="utf-8")
 
     print(f"Built {len(nights)} night(s) into {out} (latest: {latest['night']}, {len(latest['games'])} games)")
     return 0

@@ -39,7 +39,7 @@ Tools: WebSearch and WebFetch. A cloud session's shell usually can't reach these
 5. **Videos** (at most 5 per game)
    - The nba.com game recap video URL (`src: "nba"`, `kind: "recap"`) — always include when it exists.
    - YouTube videos about this game posted by the NBA (full-game highlights, player highlights). Find candidates with WebSearch `allowed_domains: ["youtube.com"]`. **Verify each** with WebFetch of `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=<ID>&format=json` and keep it only if `author_name` is exactly `"NBA"`. Try once for view counts; null if rate-limited.
-   - Optionally nba.com/watch player highlight pages for this game (`src: "nba"`).
+   - Prefer YouTube over NBA.com: YouTube videos can play inline on the page. Add nba.com/watch player highlight pages for this game (`src: "nba"`) only when there are slots left after the NBA's YouTube videos.
 
 ## 3. Writing
 

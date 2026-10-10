@@ -15,7 +15,7 @@ One file per night: `data/YYYY-MM-DD.json`, named for the date the games were pl
 | `summary` | string | 2–3 sentence AI-written overview of the night. Every claim must be backed by the games' data. |
 | `games` | array | One object per game, any order (the page orders by `schedET`). |
 
-The build adds an `archive` array (earlier nights) itself — don't put it in data files.
+The build adds `prevNight` and `nextNight` (`{"href", "label"}` or null, the neighboring built nights) itself — don't put them in data files.
 
 ## Game
 
@@ -90,5 +90,5 @@ Periods 5+ are overtime (5:00 each). Each row changes one team's score by 1–3 
 {"src": "yt", "id": "FiM7fpIctQI", "title": "CELTICS at CAVALIERS | NBA PRESEASON FULL GAME HIGHLIGHTS | October 8, 2026", "kind": "highlights", "views": null}
 ```
 
-- `kind`: `recap`, `highlights`, `player` or `other`. The page shows the recap first and sorts the rest by `views` (nulls last).
+- `kind`: `recap`, `highlights`, `player` or `other`. The page shows YouTube (`yt`) videos first — they're the ones that can play inline — then NBA.com ones; within each group the recap comes first and the rest sort by `views` (nulls last).
 - `yt` videos must be uploaded by the NBA's own channel (checked via YouTube oEmbed `author_name == "NBA"`). On the hosted site they play inline; `nba` videos open NBA.com.
