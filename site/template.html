@@ -434,7 +434,8 @@ footer strong{color:var(--ink)}
 
   const tkItem = g=>{const w=winner(g);return `<button class="tk" data-go="${g.id}"><span class="t">${clock(g._s,'')}</span><b class="${w==='away'?'':'l'}">${g.away.abbr} ${g.away.score}</b><b class="${w==='home'?'':'l'}">${g.home.abbr} ${g.home.score}</b><em>FINAL${otTag(g)}</em></button>`;};
   const tks = games.map(tkItem).join('');
-  $('#ticker').innerHTML = tks + tks.replace(/<button /g,'<button tabindex="-1" aria-hidden="true" ');
+  const tkCopy = tks.replace(/<button /g,'<button tabindex="-1" aria-hidden="true" ');
+  $('#ticker').innerHTML = tks;
   $('#ticker').addEventListener('click',e=>{const b=e.target.closest('[data-go]');if(b)goTo(b.dataset.go);});
 
   // ----- ticker motion: steady crawl; drag, swipe or scroll to move it either way; let go to resume -----
@@ -442,9 +443,24 @@ footer strong{color:var(--ink)}
     const track=$('#ticker'),bar=track.parentElement;
     const setH=()=>document.documentElement.style.setProperty('--tk-h',bar.offsetHeight+'px');
     setH();if('ResizeObserver' in window)new ResizeObserver(setH).observe(bar);
-    let half=track.scrollWidth/2,x=0,v=0,last=performance.now(),drag=null,suppressClick=false,holdFocus=false;
-    const base=reduce?0:half/42;                 // px per second, same pace as before
+    // The track is one real set of games plus enough hidden copies to cover the viewport at any offset.
+    let half=0,base=0,x=0,v=0,last=performance.now(),drag=null,suppressClick=false,holdFocus=false;
     const wrap=()=>{if(half>0){x%=half;if(x>0)x-=half;}};
+    const realCount=games.length;
+    let copies=0;
+    function fill(){
+      const kids=track.children;
+      half=realCount?kids[realCount-1].getBoundingClientRect().right-kids[0].getBoundingClientRect().left:0;
+      const need=half>0?Math.max(1,Math.ceil(bar.clientWidth/half)):1;
+      if(need!==copies){
+        while(kids.length>realCount)track.lastElementChild.remove();
+        track.insertAdjacentHTML('beforeend',tkCopy.repeat(need));
+        copies=need;
+      }
+      base=reduce?0:half/42;                     // px per second
+      wrap();
+    }
+    fill();
     function frame(t){
       const dt=Math.min(.05,(t-last)/1000);last=t;
       if(!drag){
@@ -456,7 +472,8 @@ footer strong{color:var(--ink)}
       requestAnimationFrame(frame);
     }
     requestAnimationFrame(frame);
-    addEventListener('resize',()=>{half=track.scrollWidth/2;wrap();});
+    addEventListener('resize',fill);
+    if(document.fonts)document.fonts.ready.then(fill);
     bar.addEventListener('pointerdown',e=>{if(e.button!==0)return;drag={id:e.pointerId,x0:e.clientX,lx:e.clientX,lt:performance.now(),moved:0,captured:false};v=0;});
     bar.addEventListener('pointermove',e=>{
       if(!drag||e.pointerId!==drag.id)return;
