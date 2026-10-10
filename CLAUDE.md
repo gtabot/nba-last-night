@@ -27,7 +27,7 @@ A static, single-page recap of the previous night's NBA games. One HTML template
 - Top performers: top 4 per team by game score (`TOP_N` in the template), cards two per row. Stat line rule (`statline()` in the template): pts if ≥ 10 (+ "N 3P" if ≥ 7 threes); then reb/ast (≥ 5) and stl/blk (≥ 2), highest first, up to 3 stats; if fewer than 2, fill with the biggest remaining counting stats (pts first). Chips only ever show counting stats (pts, reb, ast, stl, blk, 3P made), never shooting splits; the splits sit on the line underneath.
 - Margin chart: team colors, ±20 default y-axis, expands to the nearest 5.
 - Tip-off board: bars run from listed tip to final buzzer (header just says "Eastern time"); unpublished lengths drawn as 2:15, same style.
-- Previous/Next night links sit above the header (« older night left, newer night » right), built by `build.py` as `prevNight`/`nextNight`; no archive list in the footer.
+- Previous/Next night links sit just below the tip-off board (« older night left, newer night » right), built by `build.py` as `prevNight`/`nextNight`; no archive list in the footer.
 - Videos: YouTube first (they embed), then NBA.com; recap leads within each group, then by views.
 - Links toggle (NBA.com / Basketball Reference); preseason box scores stay on NBA.com.
 - Theme toggle (Light / Dark / Auto). Auto follows the device. An inline script in <head> applies the saved theme before first paint.

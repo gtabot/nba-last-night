@@ -54,7 +54,7 @@ button{font:inherit;color:inherit}
 
 /* ---------- masthead ---------- */
 .hero{padding-block:36px 24px;display:grid;gap:14px}
-.daynav{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-family:var(--mono);font-size:13px}
+.daynav{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-family:var(--mono);font-size:13px;margin-top:14px}
 .daynav a{color:var(--muted);text-decoration:none}
 .daynav a:hover{color:var(--ink);text-decoration:underline}
 .daynav .next{margin-left:auto;text-align:right}
@@ -297,7 +297,6 @@ footer strong{color:var(--ink)}
 
 <div class="wrap">
   <header class="hero">
-    <nav class="daynav" id="daynav" aria-label="Other nights" hidden></nav>
     <div class="toprow"><div class="eyebrow" id="h-date"></div>
       <div class="controls">
         <div class="seg" role="group" aria-label="Where game and player links go"><span>Links</span><span class="seg-btns" id="seg-links"><button type="button" data-src="nba" aria-pressed="true">NBA.com</button><button type="button" data-src="bbr" aria-pressed="false">Basketball Reference</button></span></div>
@@ -313,6 +312,7 @@ footer strong{color:var(--ink)}
     <div class="tl-head"><h2 id="tl-h">Tip-off board</h2><span class="eyebrow">Eastern time</span></div>
     <div class="tl-scroll" id="tl"></div>
   </section>
+  <nav class="daynav" id="daynav" aria-label="Other nights" hidden></nav>
 </main>
 <div class="wrap"><footer id="foot"></footer></div>
 <button class="totop" id="totop" type="button" aria-label="Back to top" tabindex="-1"><svg viewBox="0 0 16 16"><path d="M3 10l5-5 5 5"/></svg></button>
