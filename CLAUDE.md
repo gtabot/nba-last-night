@@ -28,6 +28,7 @@ A static, single-page recap of the previous night's NBA games. One HTML template
 - Margin chart: team colors, ±20 default y-axis, expands to the nearest 5.
 - Tip-off board: bars run from listed tip to final buzzer (header just says "Eastern time"); unpublished lengths drawn as 2:15, same style.
 - Previous/Next night links sit just below the tip-off board (« older night left, newer night » right), built by `build.py` as `prevNight`/`nextNight`; no archive list in the footer. On mobile they drop the weekday.
+- The "Last Night in the NBA" title links to the site root, which always shows the latest night (`homeHref` from `build.py`).
 - The date at the top links to that night's own page (`nightHref` from `build.py`); on mobile it sits below the Links/Theme toggles.
 - Videos: YouTube first (they embed), then NBA.com; recap leads within each group, then by views.
 - Links toggle (NBA.com / Basketball Reference); preseason box scores stay on NBA.com.

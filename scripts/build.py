@@ -65,9 +65,10 @@ def main() -> int:
     out.mkdir(parents=True)
 
     def nav_for(i: int, prefix: str) -> dict:
-        """This night's own page, plus the night before (older) and the night after (newer), if built."""
+        """The latest night's page, this night's own page, plus the night before (older) and the night after (newer), if built."""
         link = lambda d: {"href": f"{prefix}{d['night']}/", "label": d["nightLabel"]}
-        return {"nightHref": f"{prefix}{nights[i]['night']}/",
+        return {"homeHref": prefix or "./",
+                "nightHref": f"{prefix}{nights[i]['night']}/",
                 "prevNight": link(nights[i + 1]) if i + 1 < len(nights) else None,
                 "nextNight": link(nights[i - 1]) if i > 0 else None}
 
