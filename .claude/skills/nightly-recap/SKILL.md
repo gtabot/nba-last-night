@@ -20,9 +20,16 @@ Game data comes ONLY from NBA-owned sources:
 
 The one exception: Basketball Reference **player ids**, used only to build links. Never use ESPN, CBS, Yahoo, surprisesports, Bleacher Report or fan sites for anything, even to fill gaps. If the NBA hasn't published something yet, leave it null or mark the game partial (step 4). Never invent or estimate a number.
 
-Tools: WebSearch and WebFetch. A cloud session's shell usually can't reach these sites directly.
+Tools: WebSearch and WebFetch for finding things. A cloud session's `statsdmz.nba.com` (game books) and `cdn.nba.com` often fail (timeouts, 403), and WebFetch only summarizes pages, so it misses data that nba.com loads client-side.
 
-## 2. Per game (use one subagent per game when there are more than two)
+**Primary data source: the nba.com box-score page, fetched with `curl` from Bash.** `curl -sS -m 40 -A "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/124.0 Safari/537.36" https://www.nba.com/game/<away>-vs-<home>-<gameId>/box-score` returns HTML with a `<script id="__NEXT_DATA__">` JSON blob. Parse `props.pageProps` with Python (`python3 -I`, save the page to a scratch dir first):
+- `game`: `gameEt` (listed tip, already Eastern), `duration` ("0:00" = unpublished, so null), `attendance` (0 = null), `arena`, `homeTeam`/`awayTeam` with `score`, `periods` and `players[].statistics` (full box score), `highlightVideos` (nba.com video permalinks).
+- `playByPlay.actions`: every play with `scoreAway`/`scoreHome`. Start of Q1 (`startET`) is in the "Start of 1st Period (h:mm AM/PM ...)" action. Build `flow` only from made shots and made free throws (description has `(N PTS)`, not `MISS`), because non-scoring actions such as instant replays carry stale scores. Sort them by total score, then actionNumber, and only then diff. Clock is `PT11M41.00S`, so use whole seconds.
+- Do this yourself rather than via subagents: it is a few `curl` calls and one script. The game book is only a fallback and the source of "Game Duration" when it is reachable.
+- Basketball Reference rosters work with `curl` too (single-quoted hrefs: `<a href='/players/t/thomame01.html'>`), as does the YouTube oEmbed check.
+- Do not conclude "unreachable" from WebFetch or from `statsdmz`/`cdn.nba.com` alone. Try the curl page above first. Running the check through the proxy does not help; the session already uses it.
+
+## 2. Per game (use the curl method above; subagents only if the volume needs it, and tell them about curl)
 
 1. **Game list, ids, listed tip times:** WebFetch `https://www.nba.com/games?date=YYYY-MM-DD` (and `https://www.nba.com/schedule` if tip times aren't shown).
 2. **Official game book:** `https://statsdmz.nba.com/pdfs/YYYYMMDD/YYYYMMDD_AWYHOM_book.pdf` with nba.com codes (e.g. `20261008_PHIBKN_book.pdf`). WebFetch summarizes, so ask for ONE section per call and ask for exact rows:
